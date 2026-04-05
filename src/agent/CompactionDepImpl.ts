@@ -23,7 +23,7 @@ export class CompactionDepImpl implements CompactionDep {
         messages: rawMessages,
         toolUseContext: this.toolUseContext,
       })
-      if (microResult.messages !== rawMessages) {
+      if (microResult.messages !== rawMessages && Array.isArray(microResult.messages)) {
         return {
           compacted: true,
           messages: microResult.messages as unknown as CoreMessage[],
@@ -43,7 +43,7 @@ export class CompactionDepImpl implements CompactionDep {
           tokenUsage: tokenCount,
           model: this.toolUseContext.options.mainLoopModel,
         })
-        if (autoResult?.messages) {
+        if (autoResult?.messages && Array.isArray(autoResult.messages)) {
           return {
             compacted: true,
             messages: autoResult.messages as unknown as CoreMessage[],

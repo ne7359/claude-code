@@ -282,7 +282,7 @@ export class AgentLoop {
         messages = compactionResult.messages
       }
 
-      // --- Step 9: 继续 ---
+      // --- Step 9: 继续下一次循环 ---
     }
 
     // 达到 max turns
@@ -314,6 +314,8 @@ export class AgentLoop {
       role: 'user',
       content,
       timestamp: Date.now(),
+      // 嵌套格式兼容 — queryModel() 的 normalizeMessagesForAPI 访问 message.message.content
+      message: { role: 'user', content },
     }
   }
 
@@ -326,6 +328,8 @@ export class AgentLoop {
       role: 'user',
       content: blocks,
       timestamp: Date.now(),
+      // 嵌套格式兼容 — 工具结果需要 message.message.content 才能被 queryModel 正确处理
+      message: { role: 'user', content: blocks },
     }
   }
 
@@ -398,6 +402,13 @@ export class AgentLoop {
       usage: { ...turnState.turnUsage },
       stop_reason: turnState.stopReason,
       timestamp: Date.now(),
+      // 嵌套格式兼容 — 与 queryModel 返回的 AssistantMessage 格式一致
+      message: {
+        role: 'assistant',
+        content,
+        stop_reason: turnState.stopReason,
+        usage: { ...turnState.turnUsage },
+      },
     }
   }
 

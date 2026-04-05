@@ -30,13 +30,17 @@ export class ToolDepImpl implements ToolDep {
     }
 
     try {
-      // 调用 Tool.call() — 需要简化签名
+      // 调用 Tool.call() — 签名: (args, context, canUseTool, parentMessage, onProgress?)
       const result = await realTool.call(
         input as any,
-        this.toolUseContext,
+        {
+          ...this.toolUseContext,
+          toolUseId: context.toolUseId,
+        },
         async () => ({ decision: 'allow' as const }),
         { type: 'assistant', uuid: crypto.randomUUID(), message: { role: 'assistant', content: [] } } as any,
-        context.toolUseId,
+        // onProgress — 工具执行进度回调（WebSearch 等工具需要）
+        (_progress: unknown) => {},
       )
 
       // 将 Tool 的原始输出转为 ToolResult
